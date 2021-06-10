@@ -163,6 +163,67 @@ vector<Uzytkownik> zmianaHasla(vector<Uzytkownik> uzytkownicy,int idZalogowanego
     return uzytkownicy;
 }
 
+void AktualizujPlikPoEdytowaniu(vector<kontakt> Kontakty,int IDEdytowanegoAdresata) {
+    fstream plik,plik2;
+    string WczytywanaLinia="";
+    int LiczbaPrzedzielen=0;
+    int IdKontaktu=0;
+    string RozdzielonaLinia="";
+    plik.open("KsiazkaAdresowaTymczasowa.txt",ios::out | ios::app);
+    plik2.open("KsiazkaAdresowa.txt", ios::in );
+    if (plik.good() == true) {
+        if (plik2.good() == true) {
+            while(getline(plik2, WczytywanaLinia)) {
+                int DlugoscWczytywanejLinii=WczytywanaLinia.length();
+                for(int j=0; j<DlugoscWczytywanejLinii-1; j++){
+                    if(WczytywanaLinia[j]=='|') {
+                        switch(LiczbaPrzedzielen) {
+                        case 0:
+                            RozdzielonaLinia=WczytywanaLinia.substr(0,j);
+                            IdKontaktu = atoi(RozdzielonaLinia.c_str());
+                            if(IDEdytowanegoAdresata==IdKontaktu-1){
+                                plik<<Kontakty[IDEdytowanegoAdresata].id<<"|";
+                                plik<<Kontakty[IDEdytowanegoAdresata].idUzytkownika<<"|";
+                                plik<<Kontakty[IDEdytowanegoAdresata].imie<<"|";
+                                plik<<Kontakty[IDEdytowanegoAdresata].nazwisko<<"|";
+                                plik<< Kontakty[IDEdytowanegoAdresata].nr_tel<<"|";
+                                plik<< Kontakty[IDEdytowanegoAdresata].adres<<"|";
+                                plik<< Kontakty[IDEdytowanegoAdresata].email<<"|"<<endl;
+                            } else {
+                                plik<<WczytywanaLinia<<endl;
+                            }
+                            LiczbaPrzedzielen++;
+                            break;
+                        case 1:
+                            LiczbaPrzedzielen++;
+                            break;
+                        case 2:
+                            LiczbaPrzedzielen++;
+                            break;
+                        case 3:
+                            LiczbaPrzedzielen++;
+                            break;
+                        case 4:
+                            LiczbaPrzedzielen++;
+                            break;
+                        case 5:
+                            LiczbaPrzedzielen++;
+                            break;
+                        case 6:
+                            LiczbaPrzedzielen=0;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    plik.close();
+    plik2.close();
+    remove("KsiazkaAdresowa.txt");
+    rename("KsiazkaAdresowaTymczasowa.txt","KsiazkaAdresowa.txt");
+}
+
 void AktualizujPlikPoUsunieciu(vector<kontakt> Kontakty) {
     fstream plik;
     int LiczbaKontaktow=Kontakty.size();
@@ -306,9 +367,9 @@ vector<kontakt> WczytywanieAdresow(vector<kontakt> Kontakty,int idZalogowanegoUz
                         WczytywanaLinia=WczytywanaLinia.erase(0,j+1);
                         DlugoscWczytywanejLinii=DlugoscWczytywanejLinii-j-1;
                         LiczbaPrzedzielen=0;
-                        //if(idZalogowanegoUzytkownika==WczytywanyKontakt.idUzytkownika){
-                        Kontakty.push_back(WczytywanyKontakt);
-                        //}
+                        if(idZalogowanegoUzytkownika==WczytywanyKontakt.idUzytkownika) {
+                            Kontakty.push_back(WczytywanyKontakt);
+                        }
                         break;
                     }
                 }
@@ -406,7 +467,7 @@ vector<kontakt> EdytujAdresata(vector<kontakt> Kontakty,int idZalogowanegoUzytko
             cout<<"Podaj nowe imie adresata :";
             cin>>zmiana;
             Kontakty[ID].imie=zmiana;
-            AktualizujPlikPoUsunieciu(Kontakty);
+            AktualizujPlikPoEdytowaniu(Kontakty,ID);
             cout<<"Imie zostalo zmienione."<<endl;
             Sleep(1500);
             break;
@@ -414,7 +475,7 @@ vector<kontakt> EdytujAdresata(vector<kontakt> Kontakty,int idZalogowanegoUzytko
             cout<<"Podaj nowe nazwisko adresata :";
             cin>>zmiana;
             Kontakty[ID].nazwisko=zmiana;
-            AktualizujPlikPoUsunieciu(Kontakty);
+            AktualizujPlikPoEdytowaniu(Kontakty,ID);
             cout<<"Nazwisko zostalo zmienione."<<endl;
             Sleep(1500);
             break;
@@ -422,7 +483,7 @@ vector<kontakt> EdytujAdresata(vector<kontakt> Kontakty,int idZalogowanegoUzytko
             cout<<"Podaj nowy numer telefonu adresata :";
             cin>>zmiana;
             Kontakty[ID].nr_tel=zmiana;
-            AktualizujPlikPoUsunieciu(Kontakty);
+            AktualizujPlikPoEdytowaniu(Kontakty,ID);
             cout<<"Numer telefonu zostal zmieniony."<<endl;
             Sleep(1500);
             break;
@@ -431,7 +492,7 @@ vector<kontakt> EdytujAdresata(vector<kontakt> Kontakty,int idZalogowanegoUzytko
             cin.sync();
             getline(cin,zmiana);
             Kontakty[ID].adres=zmiana;
-            AktualizujPlikPoUsunieciu(Kontakty);
+            AktualizujPlikPoEdytowaniu(Kontakty,ID);
             cout<<"Adres zostal zmieniony."<<endl;
             Sleep(1500);
             break;
@@ -439,7 +500,7 @@ vector<kontakt> EdytujAdresata(vector<kontakt> Kontakty,int idZalogowanegoUzytko
             cout<<"Podaj nowy email adresata :";
             cin>>zmiana;
             Kontakty[ID].email=zmiana;
-            AktualizujPlikPoUsunieciu(Kontakty);
+            AktualizujPlikPoEdytowaniu(Kontakty,ID);
             cout<<"Email zostal zmieniony."<<endl;
             Sleep(1500);
             break;
@@ -456,7 +517,6 @@ vector<kontakt> EdytujAdresata(vector<kontakt> Kontakty,int idZalogowanegoUzytko
 int main() {
     vector<Uzytkownik> uzytkownicy;
     int idZalogowanegoUzytkownika=0;
-    int iloscUzytkownikow=0;
     uzytkownicy=WczytywanieUzytkownikow(uzytkownicy);
     vector<kontakt>Kontakty;
     char wybor;
@@ -507,9 +567,7 @@ int main() {
                     break;
                 case '4':
                     for(int i=0; i<LiczbaKontaktow; i++) {
-                        if(Kontakty[i].idUzytkownika==idZalogowanegoUzytkownika) {
-                            WyswietlKontakt(Kontakty[i]);
-                        }
+                        WyswietlKontakt(Kontakty[i]);
                     }
                     cout<<"Wcisnij enter aby kontynuowac...";
                     getch();
