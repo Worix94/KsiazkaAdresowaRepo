@@ -31,7 +31,6 @@ void AktualizujPlikPoZmianieHasla(vector<Uzytkownik> uzytkownicy) {
         plik.close();
         remove("Uzytkownicy.txt");
         rename("UzytkownicyTymczasowa.txt","Uzytkownicy.txt");
-        remove("UzytkownicyTymczasowa.txt");
     }
 }
 
@@ -70,7 +69,6 @@ vector<Uzytkownik> WczytywanieUzytkownikow(vector<Uzytkownik> uzytkownicy) {
                         WczytywanyUzytkownik.haslo =RozdzielonaLinia;
                         WczytywanaLinia=WczytywanaLinia.erase(0,j+1);
                         DlugoscWczytywanejLinii=DlugoscWczytywanejLinii-j-1;
-                        LiczbaPrzedzielen++;
                         LiczbaPrzedzielen=0;
                         uzytkownicy.push_back(WczytywanyUzytkownik);
                         break;
@@ -163,7 +161,69 @@ vector<Uzytkownik> zmianaHasla(vector<Uzytkownik> uzytkownicy,int idZalogowanego
     return uzytkownicy;
 }
 
-void AktualizujPlikPoEdytowaniu(vector<kontakt> Kontakty,int IDEdytowanegoAdresata) {
+void AktualizujPlikPoEdytowaniu(vector<kontakt> Kontakty,int IteratorAdresata) {
+    fstream plik,plik2;
+    string WczytywanaLinia="";
+    int LiczbaPrzedzielen=0;
+    int IdKontaktu=0;
+    int IDEdytowanegoAdresata=Kontakty[IteratorAdresata].id;
+    string RozdzielonaLinia="";
+    plik.open("KsiazkaAdresowaTymczasowa.txt",ios::out | ios::app);
+    plik2.open("KsiazkaAdresowa.txt", ios::in );
+    if (plik.good() == true) {
+        if (plik2.good() == true) {
+            while(getline(plik2, WczytywanaLinia)) {
+                int DlugoscWczytywanejLinii=WczytywanaLinia.length();
+                for(int j=0; j<DlugoscWczytywanejLinii-1; j++) {
+                    if(WczytywanaLinia[j]=='|') {
+                        switch(LiczbaPrzedzielen) {
+                        case 0:
+                            RozdzielonaLinia=WczytywanaLinia.substr(0,j);
+                            IdKontaktu = atoi(RozdzielonaLinia.c_str());
+                            if(IDEdytowanegoAdresata!=IdKontaktu) {
+                                plik<<WczytywanaLinia<<endl;
+                            } else {
+                                plik<<Kontakty[IteratorAdresata].id<<"|";
+                                plik<<Kontakty[IteratorAdresata].idUzytkownika<<"|";
+                                plik<<Kontakty[IteratorAdresata].imie<<"|";
+                                plik<<Kontakty[IteratorAdresata].nazwisko<<"|";
+                                plik<<Kontakty[IteratorAdresata].nr_tel<<"|";
+                                plik<<Kontakty[IteratorAdresata].adres<<"|";
+                                plik<<Kontakty[IteratorAdresata].email<<"|"<<endl;
+                            }
+                            LiczbaPrzedzielen++;
+                            break;
+                        case 1:
+                            LiczbaPrzedzielen++;
+                            break;
+                        case 2:
+                            LiczbaPrzedzielen++;
+                            break;
+                        case 3:
+                            LiczbaPrzedzielen++;
+                            break;
+                        case 4:
+                            LiczbaPrzedzielen++;
+                            break;
+                        case 5:
+                            LiczbaPrzedzielen++;
+                            break;
+                        case 6:
+                            LiczbaPrzedzielen=0;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    plik.close();
+    plik2.close();
+    remove("KsiazkaAdresowa.txt");
+    rename("KsiazkaAdresowaTymczasowa.txt","KsiazkaAdresowa.txt");
+}
+
+void AktualizujPlikPoUsunieciu(vector<kontakt> Kontakty,int IDEdytowanegoAdresata) {
     fstream plik,plik2;
     string WczytywanaLinia="";
     int LiczbaPrzedzielen=0;
@@ -175,21 +235,13 @@ void AktualizujPlikPoEdytowaniu(vector<kontakt> Kontakty,int IDEdytowanegoAdresa
         if (plik2.good() == true) {
             while(getline(plik2, WczytywanaLinia)) {
                 int DlugoscWczytywanejLinii=WczytywanaLinia.length();
-                for(int j=0; j<DlugoscWczytywanejLinii-1; j++){
+                for(int j=0; j<DlugoscWczytywanejLinii-1; j++) {
                     if(WczytywanaLinia[j]=='|') {
                         switch(LiczbaPrzedzielen) {
                         case 0:
                             RozdzielonaLinia=WczytywanaLinia.substr(0,j);
                             IdKontaktu = atoi(RozdzielonaLinia.c_str());
-                            if(IDEdytowanegoAdresata==IdKontaktu-1){
-                                plik<<Kontakty[IDEdytowanegoAdresata].id<<"|";
-                                plik<<Kontakty[IDEdytowanegoAdresata].idUzytkownika<<"|";
-                                plik<<Kontakty[IDEdytowanegoAdresata].imie<<"|";
-                                plik<<Kontakty[IDEdytowanegoAdresata].nazwisko<<"|";
-                                plik<< Kontakty[IDEdytowanegoAdresata].nr_tel<<"|";
-                                plik<< Kontakty[IDEdytowanegoAdresata].adres<<"|";
-                                plik<< Kontakty[IDEdytowanegoAdresata].email<<"|"<<endl;
-                            } else {
+                            if(IDEdytowanegoAdresata!=IdKontaktu) {
                                 plik<<WczytywanaLinia<<endl;
                             }
                             LiczbaPrzedzielen++;
@@ -224,27 +276,6 @@ void AktualizujPlikPoEdytowaniu(vector<kontakt> Kontakty,int IDEdytowanegoAdresa
     rename("KsiazkaAdresowaTymczasowa.txt","KsiazkaAdresowa.txt");
 }
 
-void AktualizujPlikPoUsunieciu(vector<kontakt> Kontakty) {
-    fstream plik;
-    int LiczbaKontaktow=Kontakty.size();
-    plik.open("KsiazkaAdresowaTymczasowa.txt",ios::out | ios::app);
-    if (plik.good() == true) {
-        for(int i=0; i<LiczbaKontaktow; i++) {
-            plik<<Kontakty[i].id<<"|";
-            plik<<Kontakty[i].idUzytkownika<<"|";
-            plik<<Kontakty[i].imie<<"|";
-            plik<<Kontakty[i].nazwisko<<"|";
-            plik<< Kontakty[i].nr_tel<<"|";
-            plik<< Kontakty[i].adres<<"|";
-            plik<< Kontakty[i].email<<"|"<<endl;
-        }
-        plik.close();
-        remove("KsiazkaAdresowa.txt");
-        rename("KsiazkaAdresowaTymczasowa.txt","KsiazkaAdresowa.txt");
-        remove("KsiazkaAdresowaTymczasowa.txt");
-    }
-}
-
 void WyswietlKontakt(kontakt WyswietlanyKontakt) {
     cout<<"Id: "<<WyswietlanyKontakt.id<<endl;
     cout<<"Imie: "<<WyswietlanyKontakt.imie<<endl;
@@ -255,7 +286,11 @@ void WyswietlKontakt(kontakt WyswietlanyKontakt) {
 }
 
 vector<kontakt> DodajKontakt(vector<kontakt> Kontakty,int idZalogowanegoUzytkownika) {
-    int LiczbaKontaktow=Kontakty.size();
+    fstream plik;
+    string WczytywanaLinia="";
+    int LiczbaPrzedzielen=0;
+    string RozdzielonaLinia="";
+    int DlugoscWczytywanejLinii;
     string imie,nazwisko,email,adres,nr_tel;
     cout << "Podaj imie: ";
     cin>>imie;
@@ -270,15 +305,51 @@ vector<kontakt> DodajKontakt(vector<kontakt> Kontakty,int idZalogowanegoUzytkown
     cout << "Podaj e-mail: ";
     cin>>email;
     kontakt DodawanyKontakt;
-    if(LiczbaKontaktow==0)DodawanyKontakt.id=1;
-    else DodawanyKontakt.id=(Kontakty[LiczbaKontaktow-1].id+1);
+    int IDOstatniegoKontaktu=0;
+    plik.open( "KsiazkaAdresowa.txt", ios::in );
+    if (plik.good() == true) {
+        while(getline( plik, WczytywanaLinia )) {
+            DlugoscWczytywanejLinii=WczytywanaLinia.length();
+            for(int j=0; j<DlugoscWczytywanejLinii-1; j++) {
+                if(WczytywanaLinia[j]=='|') {
+                    switch(LiczbaPrzedzielen) {
+                    case 0:
+                        RozdzielonaLinia=WczytywanaLinia.substr(0,j);
+                        IDOstatniegoKontaktu = atoi(RozdzielonaLinia.c_str());
+                        LiczbaPrzedzielen++;
+                        break;
+                    case 1:
+                        LiczbaPrzedzielen++;
+                        break;
+                    case 2:
+                        LiczbaPrzedzielen++;
+                        break;
+                    case 3:
+                        LiczbaPrzedzielen++;
+                        break;
+                    case 4:
+                        LiczbaPrzedzielen++;
+                        break;
+                    case 5:
+                        LiczbaPrzedzielen++;
+                        break;
+                    case 6:
+                        LiczbaPrzedzielen=0;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    plik.close();
+    if(IDOstatniegoKontaktu==0)DodawanyKontakt.id=1;
+    else DodawanyKontakt.id=(IDOstatniegoKontaktu+1);
     DodawanyKontakt.idUzytkownika=idZalogowanegoUzytkownika;
     DodawanyKontakt.imie=imie;
     DodawanyKontakt.nazwisko=nazwisko;
     DodawanyKontakt.nr_tel=nr_tel;
     DodawanyKontakt.adres=adres;
     DodawanyKontakt.email=email;
-    fstream plik;
     plik.open("KsiazkaAdresowa.txt",ios::out | ios::app);
     if (plik.good() == true) {
         plik<<DodawanyKontakt.id<<"|";
@@ -380,7 +451,7 @@ vector<kontakt> WczytywanieAdresow(vector<kontakt> Kontakty,int idZalogowanegoUz
     return Kontakty;
 }
 
-void WyszukiwaniePoNazwisku (vector<kontakt> Kontakty,int idZalogowanegoUzytkownika) {
+void WyszukiwaniePoNazwisku (vector<kontakt> Kontakty) {
     string nazwisko="";
     int LiczbaKontaktow=Kontakty.size();
     int LiczbaKontaktowNiepasujacychDoWyszukania=0;
@@ -388,7 +459,7 @@ void WyszukiwaniePoNazwisku (vector<kontakt> Kontakty,int idZalogowanegoUzytkown
     cin>>nazwisko;
     for(int i=0; i<LiczbaKontaktow; i++) {
         if(Kontakty[i].nazwisko==nazwisko) {
-            if(Kontakty[i].idUzytkownika==idZalogowanegoUzytkownika)WyswietlKontakt(Kontakty[i]);
+            WyswietlKontakt(Kontakty[i]);
         } else LiczbaKontaktowNiepasujacychDoWyszukania++;
         if(LiczbaKontaktowNiepasujacychDoWyszukania>=LiczbaKontaktow) {
             cout<<"Brak kontaktow o takim nazwisku"<<endl;
@@ -396,7 +467,7 @@ void WyszukiwaniePoNazwisku (vector<kontakt> Kontakty,int idZalogowanegoUzytkown
     }
 }
 
-void WyszukiwaniePoImieniu (vector<kontakt> Kontakty,int idZalogowanegoUzytkownika) {
+void WyszukiwaniePoImieniu (vector<kontakt> Kontakty) {
     string imie="";
     int LiczbaKontaktowNiepasujacychDoWyszukania=0;
     cout<<"Podaj imie: ";
@@ -404,7 +475,7 @@ void WyszukiwaniePoImieniu (vector<kontakt> Kontakty,int idZalogowanegoUzytkowni
     int LiczbaKontaktow=Kontakty.size();
     for(int i=0; i<LiczbaKontaktow; i++) {
         if(Kontakty[i].imie==imie) {
-            if(Kontakty[i].idUzytkownika==idZalogowanegoUzytkownika)WyswietlKontakt(Kontakty[i]);
+            WyswietlKontakt(Kontakty[i]);
         } else LiczbaKontaktowNiepasujacychDoWyszukania++;
         if(LiczbaKontaktowNiepasujacychDoWyszukania>=LiczbaKontaktow) {
             cout<<"Brak kontaktow o takim imieniu"<<endl;
@@ -412,7 +483,7 @@ void WyszukiwaniePoImieniu (vector<kontakt> Kontakty,int idZalogowanegoUzytkowni
     }
 }
 
-vector<kontakt> UsunAdresata(vector<kontakt> Kontakty,int idZalogowanegoUzytkownika) {
+vector<kontakt> UsunAdresata(vector<kontakt> Kontakty) {
     int ID=0;
     int LiczbaKontaktow=Kontakty.size();
     char znak;
@@ -423,12 +494,12 @@ vector<kontakt> UsunAdresata(vector<kontakt> Kontakty,int idZalogowanegoUzytkown
         if(Kontakty[i].id==ID) ID=i;
         else buforID++;
     }
-    if(Kontakty[ID].idUzytkownika==idZalogowanegoUzytkownika&&buforID<LiczbaKontaktow) {
+    if(buforID<LiczbaKontaktow) {
         cout<<endl<<"Jezeli chcesz usunac adresata o podanym numerze ID wcisnij t: ";
         znak=getch();
         if(znak=='t') {
+            AktualizujPlikPoUsunieciu(Kontakty,Kontakty[ID].id);
             Kontakty.erase(Kontakty.begin()+ID);
-            AktualizujPlikPoUsunieciu(Kontakty);
             cout<<"Adresat zostal usuniety"<<endl;
             Sleep(1500);
         }
@@ -436,11 +507,10 @@ vector<kontakt> UsunAdresata(vector<kontakt> Kontakty,int idZalogowanegoUzytkown
         cout<<"Nie ma adresata o podanym ID"<<endl;
         Sleep(1500);
     }
-
     return Kontakty;
 }
 
-vector<kontakt> EdytujAdresata(vector<kontakt> Kontakty,int idZalogowanegoUzytkownika) {
+vector<kontakt> EdytujAdresata(vector<kontakt> Kontakty) {
     int ID;
     char WyborParametru;
     int buforID=0;
@@ -452,7 +522,7 @@ vector<kontakt> EdytujAdresata(vector<kontakt> Kontakty,int idZalogowanegoUzytko
         if(Kontakty[i].id==ID) ID=i;
         else buforID++;
     }
-    if(Kontakty[ID].idUzytkownika==idZalogowanegoUzytkownika&&buforID<LiczbaKontaktow) {
+    if(buforID<LiczbaKontaktow) {
         system("cls");
         cout<<"Edytuj: "<<endl;
         cout<<"1.Imie"<<endl;
@@ -556,12 +626,12 @@ int main() {
                     LiczbaKontaktow=Kontakty.size();
                     break;
                 case '2':
-                    WyszukiwaniePoImieniu(Kontakty,idZalogowanegoUzytkownika);
+                    WyszukiwaniePoImieniu(Kontakty);
                     cout<<"Wcisnij enter aby kontynuowac...";
                     getch();
                     break;
                 case '3':
-                    WyszukiwaniePoNazwisku(Kontakty,idZalogowanegoUzytkownika);
+                    WyszukiwaniePoNazwisku(Kontakty);
                     cout<<"Wcisnij enter aby kontynuowac...";
                     getch();
                     break;
@@ -573,11 +643,11 @@ int main() {
                     getch();
                     break;
                 case '5':
-                    Kontakty=UsunAdresata(Kontakty,idZalogowanegoUzytkownika);
+                    Kontakty=UsunAdresata(Kontakty);
                     LiczbaKontaktow=Kontakty.size();
                     break;
                 case '6':
-                    Kontakty=EdytujAdresata(Kontakty,idZalogowanegoUzytkownika);
+                    Kontakty=EdytujAdresata(Kontakty);
                     break;
                 case '7':
                     uzytkownicy=zmianaHasla(uzytkownicy,idZalogowanegoUzytkownika);
