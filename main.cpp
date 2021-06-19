@@ -6,11 +6,6 @@
 
 using namespace std;
 
-struct Uzytkownik {
-    int id;
-    string nazwa,haslo;
-};
-
 struct kontakt {
     int id=0;
     int idUzytkownika=0;
@@ -18,145 +13,152 @@ struct kontakt {
     string nr_tel="",adres="",email="";
 };
 
-void AktualizujPlikPoZmianieHasla(vector<Uzytkownik> uzytkownicy) {
-    fstream plik;
-    int LiczbaUzytkownikow=uzytkownicy.size();
-    plik.open("UzytkownicyTymczasowa.txt",ios::out | ios::app);
-    if (plik.good() == true) {
-        for(int i=0; i<LiczbaUzytkownikow; i++) {
-            plik<<uzytkownicy[i].id<<"|";
-            plik<<uzytkownicy[i].nazwa<<"|";
-            plik<<uzytkownicy[i].haslo<<"|"<<endl;
-        }
-        plik.close();
-        remove("Uzytkownicy.txt");
-        rename("UzytkownicyTymczasowa.txt","Uzytkownicy.txt");
-    }
-}
+class Uzytkownik {
+    int id;
+    string nazwa,haslo;
+public:
+    vector<Uzytkownik> uzytkownicy;
 
-void WczytywanieUzytkownikow(vector<Uzytkownik> &uzytkownicy) {
-    fstream plik;
-    int DlugoscWczytywanejLinii=0;
-    string WczytywanaLinia="";
-    Uzytkownik WczytywanyUzytkownik;
-    string RozdzielonaLinia="";
-    int LiczbaPrzedzielen=0;
-    plik.open( "Uzytkownicy.txt", ios::in );
-    if (plik.good() == true) {
-        while(getline( plik, WczytywanaLinia )) {
-            DlugoscWczytywanejLinii=WczytywanaLinia.length();
-            for(int j=0; j<DlugoscWczytywanejLinii; j++) {
-                if(WczytywanaLinia[j]=='|') {
-                    switch(LiczbaPrzedzielen) {
-                    case 0:
-                        RozdzielonaLinia=WczytywanaLinia.substr(0,j);
-                        WczytywanyUzytkownik.id = atoi(RozdzielonaLinia.c_str());
-                        WczytywanaLinia=WczytywanaLinia.erase(0,j+1);
-                        DlugoscWczytywanejLinii=DlugoscWczytywanejLinii-j-1;
-                        LiczbaPrzedzielen++;
-                        j=0;
-                        break;
-                    case 1:
-                        RozdzielonaLinia=WczytywanaLinia.substr(0,j);
-                        WczytywanyUzytkownik.nazwa = RozdzielonaLinia;
-                        WczytywanaLinia=WczytywanaLinia.erase(0,j+1);
-                        DlugoscWczytywanejLinii=DlugoscWczytywanejLinii-j-1;
-                        LiczbaPrzedzielen++;
-                        j=0;
-                        break;
-                    case 2:
-                        RozdzielonaLinia=WczytywanaLinia.substr(0,j);
-                        WczytywanyUzytkownik.haslo =RozdzielonaLinia;
-                        WczytywanaLinia=WczytywanaLinia.erase(0,j+1);
-                        DlugoscWczytywanejLinii=DlugoscWczytywanejLinii-j-1;
-                        LiczbaPrzedzielen=0;
-                        uzytkownicy.push_back(WczytywanyUzytkownik);
-                        break;
+    void aktualizujPlikPoZmianieHasla(vector<Uzytkownik> uzytkownicy) {
+        fstream plik;
+        int LiczbaUzytkownikow=uzytkownicy.size();
+        plik.open("UzytkownicyTymczasowa.txt",ios::out | ios::app);
+        if (plik.good() == true) {
+            for(int i=0; i<LiczbaUzytkownikow; i++) {
+                plik<<uzytkownicy[i].id<<"|";
+                plik<<uzytkownicy[i].nazwa<<"|";
+                plik<<uzytkownicy[i].haslo<<"|"<<endl;
+            }
+            plik.close();
+            remove("Uzytkownicy.txt");
+            rename("UzytkownicyTymczasowa.txt","Uzytkownicy.txt");
+        }
+    }
+
+    void wczytywanieUzytkownikow(vector<Uzytkownik> &uzytkownicy) {
+        fstream plik;
+        int DlugoscWczytywanejLinii=0;
+        string WczytywanaLinia="";
+        Uzytkownik WczytywanyUzytkownik;
+        string RozdzielonaLinia="";
+        int LiczbaPrzedzielen=0;
+        plik.open( "Uzytkownicy.txt", ios::in );
+        if (plik.good() == true) {
+            while(getline( plik, WczytywanaLinia )) {
+                DlugoscWczytywanejLinii=WczytywanaLinia.length();
+                for(int j=0; j<DlugoscWczytywanejLinii; j++) {
+                    if(WczytywanaLinia[j]=='|') {
+                        switch(LiczbaPrzedzielen) {
+                        case 0:
+                            RozdzielonaLinia=WczytywanaLinia.substr(0,j);
+                            WczytywanyUzytkownik.id = atoi(RozdzielonaLinia.c_str());
+                            WczytywanaLinia=WczytywanaLinia.erase(0,j+1);
+                            DlugoscWczytywanejLinii=DlugoscWczytywanejLinii-j-1;
+                            LiczbaPrzedzielen++;
+                            j=0;
+                            break;
+                        case 1:
+                            RozdzielonaLinia=WczytywanaLinia.substr(0,j);
+                            WczytywanyUzytkownik.nazwa = RozdzielonaLinia;
+                            WczytywanaLinia=WczytywanaLinia.erase(0,j+1);
+                            DlugoscWczytywanejLinii=DlugoscWczytywanejLinii-j-1;
+                            LiczbaPrzedzielen++;
+                            j=0;
+                            break;
+                        case 2:
+                            RozdzielonaLinia=WczytywanaLinia.substr(0,j);
+                            WczytywanyUzytkownik.haslo =RozdzielonaLinia;
+                            WczytywanaLinia=WczytywanaLinia.erase(0,j+1);
+                            DlugoscWczytywanejLinii=DlugoscWczytywanejLinii-j-1;
+                            LiczbaPrzedzielen=0;
+                            uzytkownicy.push_back(WczytywanyUzytkownik);
+                            break;
+                        }
                     }
                 }
             }
+            plik.close();
+        }
+    }
+
+    void rejestracja(vector<Uzytkownik> &uzytkownicy) {
+        string nazwa,haslo;
+        int iloscUzytkownikow=uzytkownicy.size();
+        Uzytkownik DodawanyUzytkownik;
+        cout<<"Podaj nazwe uzytkownika: ";
+        cin>>nazwa;
+        int i=0;
+        while(i<iloscUzytkownikow) {
+            if(uzytkownicy [i].nazwa==nazwa) {
+                cout<<"Taki uzytkownik istnieje. Wpisz inna nazwe uzytkownika: ";
+                cin>>nazwa;
+                i=0;
+            } else i++;
+        }
+        cout<<"Podaj haslo: ";
+        cin>>haslo;
+        if(iloscUzytkownikow==0)DodawanyUzytkownik.id=1;
+        else DodawanyUzytkownik.id=(uzytkownicy[iloscUzytkownikow-1].id+1);
+        DodawanyUzytkownik.nazwa=nazwa;
+        DodawanyUzytkownik.haslo=haslo;
+        fstream plik;
+        plik.open("Uzytkownicy.txt",ios::out | ios::app);
+        if (plik.good() == true) {
+            plik<<DodawanyUzytkownik.id<<"|";
+            plik<<DodawanyUzytkownik.nazwa<<"|";
+            plik<<DodawanyUzytkownik.haslo<<"|"<<endl;
+        } else {
+            cout << "Nie udalo sie otworzyc pliku i zapisac do niego danych." << endl;
+            system("pause");
         }
         plik.close();
+        uzytkownicy.push_back(DodawanyUzytkownik);
+        cout<<"Konto zalozone"<<endl;
+        Sleep(1000);
     }
-}
 
-void rejestracja(vector<Uzytkownik> &uzytkownicy) {
-    string nazwa,haslo;
-    int iloscUzytkownikow=uzytkownicy.size();
-    Uzytkownik DodawanyUzytkownik;
-    cout<<"Podaj nazwe uzytkownika: ";
-    cin>>nazwa;
-    int i=0;
-    while(i<iloscUzytkownikow) {
-        if(uzytkownicy [i].nazwa==nazwa) {
-            cout<<"Taki uzytkownik istnieje. Wpisz inna nazwe uzytkownika: ";
-            cin>>nazwa;
-            i=0;
-        } else i++;
-    }
-    cout<<"Podaj haslo: ";
-    cin>>haslo;
-    if(iloscUzytkownikow==0)DodawanyUzytkownik.id=1;
-    else DodawanyUzytkownik.id=(uzytkownicy[iloscUzytkownikow-1].id+1);
-    DodawanyUzytkownik.nazwa=nazwa;
-    DodawanyUzytkownik.haslo=haslo;
-    fstream plik;
-    plik.open("Uzytkownicy.txt",ios::out | ios::app);
-    if (plik.good() == true) {
-        plik<<DodawanyUzytkownik.id<<"|";
-        plik<<DodawanyUzytkownik.nazwa<<"|";
-        plik<<DodawanyUzytkownik.haslo<<"|"<<endl;
-    } else {
-        cout << "Nie udalo sie otworzyc pliku i zapisac do niego danych." << endl;
-        system("pause");
-    }
-    plik.close();
-    uzytkownicy.push_back(DodawanyUzytkownik);
-    cout<<"Konto zalozone"<<endl;
-    Sleep(1000);
-}
-
-int logowanie(vector<Uzytkownik> uzytkownicy) {
-    int iloscUzytkownikow=uzytkownicy.size();
-    string nazwa,haslo;
-    cout<<"Podaj login: ";
-    cin>>nazwa;
-    int i=0;
-    while(i<iloscUzytkownikow) {
-        if(uzytkownicy[i].nazwa==nazwa) {
-            for(int proby=0; proby<3; proby++) {
-                cout<<"Podaj haslo. Pozostalo prob "<<3-proby<<": ";
-                cin>>haslo;
-                if (uzytkownicy[i].haslo==haslo) {
-                    cout<<"Zalogowales sie."<<endl;
-                    Sleep(1000);
-                    return uzytkownicy[i].id;
+    int logowanie(vector<Uzytkownik> uzytkownicy) {
+        int iloscUzytkownikow=uzytkownicy.size();
+        string nazwa,haslo;
+        cout<<"Podaj login: ";
+        cin>>nazwa;
+        int i=0;
+        while(i<iloscUzytkownikow) {
+            if(uzytkownicy[i].nazwa==nazwa) {
+                for(int proby=0; proby<3; proby++) {
+                    cout<<"Podaj haslo. Pozostalo prob "<<3-proby<<": ";
+                    cin>>haslo;
+                    if (uzytkownicy[i].haslo==haslo) {
+                        cout<<"Zalogowales sie."<<endl;
+                        Sleep(1000);
+                        return uzytkownicy[i].id;
+                    }
                 }
+                cout<<"Podales 3 razy bledne haslo. "<<endl;
+                Sleep(3000);
             }
-            cout<<"Podales 3 razy bledne haslo. "<<endl;
-            Sleep(3000);
+            i++;
         }
-        i++;
+        cout<<"Nie ma uzytkownika z takim loginem"<<endl;
+        Sleep(1500);
+        return 0;
     }
-    cout<<"Nie ma uzytkownika z takim loginem"<<endl;
-    Sleep(1500);
-    return 0;
-}
 
-void zmianaHasla(vector<Uzytkownik> &uzytkownicy,int idZalogowanegoUzytkownika) {
-    string haslo;
-    int iloscUzytkownikow=uzytkownicy.size();
-    cout<<"Podaj nowe haslo: ";
-    cin>>haslo;
-    for(int i=0; i<iloscUzytkownikow; i++) {
-        if(uzytkownicy[i].id==idZalogowanegoUzytkownika) {
-            uzytkownicy[i].haslo=haslo;
-            cout<<"Haslo zostalo zmienione" <<endl;
-            Sleep(1000);
+    void zmianaHasla(vector<Uzytkownik> &uzytkownicy,int idZalogowanegoUzytkownika) {
+        string haslo;
+        int iloscUzytkownikow=uzytkownicy.size();
+        cout<<"Podaj nowe haslo: ";
+        cin>>haslo;
+        for(int i=0; i<iloscUzytkownikow; i++) {
+            if(uzytkownicy[i].id==idZalogowanegoUzytkownika) {
+                uzytkownicy[i].haslo=haslo;
+                cout<<"Haslo zostalo zmienione" <<endl;
+                Sleep(1000);
+            }
         }
+        aktualizujPlikPoZmianieHasla(uzytkownicy);
     }
-    AktualizujPlikPoZmianieHasla(uzytkownicy);
-}
+};
 
 void AktualizujPlikPoEdytowaniu(vector<kontakt> Kontakty,int IteratorAdresata) {
     fstream plik,plik2;
@@ -578,9 +580,10 @@ void EdytujAdresata(vector<kontakt> &Kontakty) {
 }
 
 int main() {
-    vector<Uzytkownik> uzytkownicy;
+
+    Uzytkownik U1;
     int idZalogowanegoUzytkownika=0;
-    WczytywanieUzytkownikow(uzytkownicy);
+    U1.wczytywanieUzytkownikow(U1.uzytkownicy);
     vector<kontakt>Kontakty;
     char wybor;
     while(1) {
@@ -591,12 +594,12 @@ int main() {
             cout<<"9.Koniec Programu"<<endl;
             cin>>wybor;
             if(wybor=='1') {
-                rejestracja(uzytkownicy);
-            } else if(wybor=='2') {
-                idZalogowanegoUzytkownika=logowanie(uzytkownicy);
-            } else if(wybor=='9') {
-                exit(0);
-            }
+                    U1.rejestracja(U1.uzytkownicy);
+                } else if(wybor=='2') {
+                    idZalogowanegoUzytkownika=U1.logowanie(U1.uzytkownicy);
+                } else if(wybor=='9') {
+                    exit(0);
+                }
         } else {
             Kontakty.clear();
             WczytywanieAdresow(Kontakty,idZalogowanegoUzytkownika);
@@ -643,7 +646,7 @@ int main() {
                     EdytujAdresata(Kontakty);
                     break;
                 case '7':
-                    zmianaHasla(uzytkownicy,idZalogowanegoUzytkownika);
+                    U1.zmianaHasla(U1.uzytkownicy,idZalogowanegoUzytkownika);
                     break;
                 case '8':
                     idZalogowanegoUzytkownika=0;
