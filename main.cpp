@@ -34,7 +34,7 @@ void AktualizujPlikPoZmianieHasla(vector<Uzytkownik> uzytkownicy) {
     }
 }
 
-vector<Uzytkownik> WczytywanieUzytkownikow(vector<Uzytkownik> uzytkownicy) {
+void WczytywanieUzytkownikow(vector<Uzytkownik> &uzytkownicy) {
     fstream plik;
     int DlugoscWczytywanejLinii=0;
     string WczytywanaLinia="";
@@ -78,10 +78,9 @@ vector<Uzytkownik> WczytywanieUzytkownikow(vector<Uzytkownik> uzytkownicy) {
         }
         plik.close();
     }
-    return uzytkownicy;
 }
 
-vector<Uzytkownik> rejestracja(vector<Uzytkownik> uzytkownicy) {
+void rejestracja(vector<Uzytkownik> &uzytkownicy) {
     string nazwa,haslo;
     int iloscUzytkownikow=uzytkownicy.size();
     Uzytkownik DodawanyUzytkownik;
@@ -115,7 +114,6 @@ vector<Uzytkownik> rejestracja(vector<Uzytkownik> uzytkownicy) {
     uzytkownicy.push_back(DodawanyUzytkownik);
     cout<<"Konto zalozone"<<endl;
     Sleep(1000);
-    return uzytkownicy;
 }
 
 int logowanie(vector<Uzytkownik> uzytkownicy) {
@@ -145,7 +143,7 @@ int logowanie(vector<Uzytkownik> uzytkownicy) {
     return 0;
 }
 
-vector<Uzytkownik> zmianaHasla(vector<Uzytkownik> uzytkownicy,int idZalogowanegoUzytkownika) {
+void zmianaHasla(vector<Uzytkownik> &uzytkownicy,int idZalogowanegoUzytkownika) {
     string haslo;
     int iloscUzytkownikow=uzytkownicy.size();
     cout<<"Podaj nowe haslo: ";
@@ -158,7 +156,6 @@ vector<Uzytkownik> zmianaHasla(vector<Uzytkownik> uzytkownicy,int idZalogowanego
         }
     }
     AktualizujPlikPoZmianieHasla(uzytkownicy);
-    return uzytkownicy;
 }
 
 void AktualizujPlikPoEdytowaniu(vector<kontakt> Kontakty,int IteratorAdresata) {
@@ -285,7 +282,7 @@ void WyswietlKontakt(kontakt WyswietlanyKontakt) {
     cout<<"Adre e-mail: "<<WyswietlanyKontakt.email<<endl;
 }
 
-vector<kontakt> DodajKontakt(vector<kontakt> Kontakty,int idZalogowanegoUzytkownika) {
+void DodajKontakt(vector<kontakt> &Kontakty,int idZalogowanegoUzytkownika) {
     fstream plik;
     string WczytywanaLinia="";
     int LiczbaPrzedzielen=0;
@@ -367,10 +364,9 @@ vector<kontakt> DodajKontakt(vector<kontakt> Kontakty,int idZalogowanegoUzytkown
     cout<<"Kontakt dodany.";
     Sleep(1500);
     Kontakty.push_back(DodawanyKontakt);
-    return Kontakty;
 }
 
-vector<kontakt> WczytywanieAdresow(vector<kontakt> Kontakty,int idZalogowanegoUzytkownika) {
+void WczytywanieAdresow(vector<kontakt> &Kontakty,int idZalogowanegoUzytkownika) {
     fstream plik;
     int DlugoscWczytywanejLinii=0;
     string WczytywanaLinia="";
@@ -448,7 +444,6 @@ vector<kontakt> WczytywanieAdresow(vector<kontakt> Kontakty,int idZalogowanegoUz
         }
         plik.close();
     }
-    return Kontakty;
 }
 
 void WyszukiwaniePoNazwisku (vector<kontakt> Kontakty) {
@@ -483,7 +478,7 @@ void WyszukiwaniePoImieniu (vector<kontakt> Kontakty) {
     }
 }
 
-vector<kontakt> UsunAdresata(vector<kontakt> Kontakty) {
+void UsunAdresata(vector<kontakt> &Kontakty) {
     int ID=0;
     int LiczbaKontaktow=Kontakty.size();
     char znak;
@@ -507,10 +502,9 @@ vector<kontakt> UsunAdresata(vector<kontakt> Kontakty) {
         cout<<"Nie ma adresata o podanym ID"<<endl;
         Sleep(1500);
     }
-    return Kontakty;
 }
 
-vector<kontakt> EdytujAdresata(vector<kontakt> Kontakty) {
+void EdytujAdresata(vector<kontakt> &Kontakty) {
     int ID;
     char WyborParametru;
     int buforID=0;
@@ -581,13 +575,12 @@ vector<kontakt> EdytujAdresata(vector<kontakt> Kontakty) {
         cout<<"Nie ma adresata o podanym ID"<<endl;
         Sleep(1500);
     }
-    return Kontakty;
 }
 
 int main() {
     vector<Uzytkownik> uzytkownicy;
     int idZalogowanegoUzytkownika=0;
-    uzytkownicy=WczytywanieUzytkownikow(uzytkownicy);
+    WczytywanieUzytkownikow(uzytkownicy);
     vector<kontakt>Kontakty;
     char wybor;
     while(1) {
@@ -598,7 +591,7 @@ int main() {
             cout<<"9.Koniec Programu"<<endl;
             cin>>wybor;
             if(wybor=='1') {
-                uzytkownicy=rejestracja(uzytkownicy);
+                rejestracja(uzytkownicy);
             } else if(wybor=='2') {
                 idZalogowanegoUzytkownika=logowanie(uzytkownicy);
             } else if(wybor=='9') {
@@ -606,7 +599,7 @@ int main() {
             }
         } else {
             Kontakty.clear();
-            Kontakty=WczytywanieAdresow(Kontakty,idZalogowanegoUzytkownika);
+            WczytywanieAdresow(Kontakty,idZalogowanegoUzytkownika);
             int LiczbaKontaktow=Kontakty.size();
             char WyborMenuGlowne;
             while(idZalogowanegoUzytkownika!=0) {
@@ -622,7 +615,7 @@ int main() {
                 cin>>WyborMenuGlowne;
                 switch(WyborMenuGlowne) {
                 case '1':
-                    Kontakty=DodajKontakt(Kontakty,idZalogowanegoUzytkownika);
+                    DodajKontakt(Kontakty,idZalogowanegoUzytkownika);
                     LiczbaKontaktow=Kontakty.size();
                     break;
                 case '2':
@@ -643,14 +636,14 @@ int main() {
                     getch();
                     break;
                 case '5':
-                    Kontakty=UsunAdresata(Kontakty);
+                    UsunAdresata(Kontakty);
                     LiczbaKontaktow=Kontakty.size();
                     break;
                 case '6':
-                    Kontakty=EdytujAdresata(Kontakty);
+                    EdytujAdresata(Kontakty);
                     break;
                 case '7':
-                    uzytkownicy=zmianaHasla(uzytkownicy,idZalogowanegoUzytkownika);
+                    zmianaHasla(uzytkownicy,idZalogowanegoUzytkownika);
                     break;
                 case '8':
                     idZalogowanegoUzytkownika=0;
